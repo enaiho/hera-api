@@ -77,11 +77,7 @@ exports.registerUser = async(req,res)=>{
 
 	const hash = await bcrypt.hash(password, saltRounds);
 
-	//git remote set-url origin https://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@github.com/enaiho/hera-api.git
-
-
-
-		const user  = new User({
+	const user  = new User({
 		fname:fname,
 		lname:lname,
 		phone:phone,

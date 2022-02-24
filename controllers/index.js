@@ -19,7 +19,7 @@ const termiiIntegration = () => {}
 
 exports.homePage = async (req,res,next) => {
 
-	return res.send("<h1>Welcome to Hera Backend. </h1>");
+	return res.send("<div align='center'><h1>Welcome to Hera Backend. </h1></div>");
 }
 
 exports.verifyPhoneNumber = async (req,res,next) => {
