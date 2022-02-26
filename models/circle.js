@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 const circleSchema = new Schema({
 
     name:String,
-    user_id:String
+    user_id:String,
+    status:Number
 
 },{ timestamps:true });
 

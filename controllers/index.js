@@ -1,8 +1,6 @@
 
 
-const User = require("../models/user");
 const PhoneValidation = require("../models/phone_validation");
-
 
 const generateCode = () => {
 
@@ -13,27 +11,13 @@ const generateCode = () => {
 
 	return code;
 }
-
 const termiiIntegration = () => {}
 
-
-exports.homePage = async (req,res,next) => {
+exports.homePage = async (req,res) => {
 
 	return res.send("<div align='center'><h1>Welcome to Hera Backend. </h1></div>");
 }
-
-exports.verifyPhoneNumber = async (req,res,next) => {
-
-
-	const { phone } = req.body;
-	const user = await User.find({ phone:phone });
-	if( user.length === 0 || user === undefined ) 	return res.json({ message:"Number does not exist",exist:false });
-
-
-	return res.json({ message:"Number found", exist:true });
-}
-
-exports.isValidPhoneNumber = async (req,res,next) => {
+exports.isValidPhoneNumber = async (req,res) => {
 
 
 	const code = generateCode();

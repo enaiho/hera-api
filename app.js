@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./routes/user");
 const indexRoutes = require("./routes/index");
+const circleRoutes = require("./routes/circle");
 const mongoose = require("mongoose");
 const app = express();
 const DB_URI = 'mongodb+srv://sabiplay_user:R2kMcuhqb52MVwjp@cluster-sabiplay.vr22h.mongodb.net/HeraDB?retryWrites=true&w=majority';
@@ -14,9 +15,10 @@ app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
 
-
-app.use("/user", userRoutes);
 app.use("/", indexRoutes);
+app.use("/user", userRoutes);
+app.use("/circle", circleRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 
