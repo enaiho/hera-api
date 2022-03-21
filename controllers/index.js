@@ -11,7 +11,6 @@ const generateCode = () => {
 
 	return code;
 }
-const termiiIntegration = () => {}
 
 exports.homePage = async (req,res) => {
 

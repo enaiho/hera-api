@@ -9,11 +9,14 @@ const userSchema = new Schema({
 	phone: String,
 	email: String,
 	password:String,
+	otp:String,
+	otp_verified:Number,
+	active:Number
 
 },{ timestamps:true });
 
+
+
 module.exports = mongoose.model("User",userSchema);
-
-
 
 
