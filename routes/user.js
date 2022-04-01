@@ -9,6 +9,9 @@ router.post("/verify_phone",userController.verifyPhoneNumber);
 router.post("/verify_account",userController.verifyAccount);
 router.post("/call_termii",userController.callTermii);
 router.post("/trigger_panic",userController.triggerPanicAlert);
+router.get("/trigger_info", userController.getTriggerInfo);
+router.put("/update_safety/:triggerId",userController.updateSafety);
+
 
 
 

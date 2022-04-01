@@ -2,6 +2,7 @@
 
 const Circle = require("../models/circle");
 const Member = require("../models/member");
+const Contact = require("../models/contact");
 
 
 exports.createCircle = async(req,res)=>{
@@ -32,6 +33,25 @@ exports.addMemberToCircle = async(req,res)=>{
     if(!saved) return res.json( { message:"member has been added to circle" });
     return res.json( { message:"circle has been saved successfully. " });
 
+}
+
+exports.createEmergencyContact = async(req,res)=> {
+
+
+    const { contacts,email } = req.body;
+
+
+    const contact = new Contact({
+        contacts:JSON.parse(contacts),
+        email:email
+    });
+
+
+    const saved = await contact.save();
+    
+
+    if(!saved) return res.json( { message:"an error occurred in saving contact", saved:false });
+    return res.json( { message:"Emergency contact has been created successfully. ",saved:true });    
 
 
 
