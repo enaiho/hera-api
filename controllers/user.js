@@ -27,7 +27,6 @@ const getContactRec = async(pl) => {
 const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
 
-	let pin = "123456";
 	let data = {
 	
 	 "to":`${phone}`,
@@ -48,9 +47,9 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
   }
 
-  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
+  //const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
 
-  // const response = true;
+  const response = true;
   if( !response ) return "ko le work";
   
 
@@ -165,7 +164,7 @@ exports.triggerPanicAlert = async (req,res)=>{
 	const message = `[Solace] Hi ${frsp_name}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.: www.Solace.com/user-information`;
 		
 
-	termiiIntegration( frsp_phone, message, "sms", "trigger",trigger_id  );
+	termiiIntegration( frsp_phone, message, "sms", "trigger", email, trigger_id  );
 
 
 	return res.json( {message: "message sent successfully ", trigger_id: trigger_id, status: "sent"} );
@@ -263,6 +262,8 @@ exports.verifyPhoneNumber = async (req,res) => {
 	if( user.length === 0 || user === undefined ) 	return res.json({ message:"Number does not exist",exist:false });
 
 	return res.json({ message:"Number found", exist:true });
+
+
 }
 exports.verifyAccount = async(req,res)=> {
 
