@@ -26,7 +26,6 @@ const getContactRec = async(pl) => {
 
 const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
-
 	let data = {
 	
 	 "to":`${phone}`,
@@ -47,9 +46,11 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
   }
 
-  //const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
+  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
 
-  const response = true;
+  //const response = true;
+  
+
   if( !response ) return "ko le work";
   
 
