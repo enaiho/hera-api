@@ -46,9 +46,9 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
   }
 
-  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
+  //const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
 
-  //const response = true;
+  const response = true;
   
 
   if( !response ) return "ko le work";
@@ -70,19 +70,18 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
   return response.data;
 
-
-
 }
+
+// need to rename this method from OTP to Termii message as this is the general function that pushes message
+// via the termii api. 
 
 const sendOTPCode = (otp_data) => {
 
 
-	const { message, phone} = otp_data;
-	termiiIntegration( phone, message, "sms", "otp",""  );
+	const { message, phone} = otp_data; console.log( message );
+	const sent_to_termii =  termiiIntegration( phone, message, "sms", "otp",""  );
 
-
-
-	return true;
+	return sent_to_termii;
 
 }
 
@@ -93,7 +92,7 @@ const generateCode = () => {
 		code += (Math.floor((Math.random() * 10) + 1)).toString();
 	}
 
-	return code;
+	return code.substring(0,4);
 }
 
 
@@ -206,10 +205,10 @@ exports.registerUser = async(req,res)=>{
 
 	// const save = await GGEntries.insertMany( sanitized_pl );
 
-	const {fname,lname,phone,email,password,username} = req.body;
+	const {user,contacts} = req.body;
+	const {fname,lname,phone,email,otp_code} = JSON.parse(user);
 	const phone_rec = await getUserRec({ "phone":phone });
 	const email_rec = await getUserRec({ "email":email });
-	const otp_code = generateCode();
 	let otp_sent = false;
 
 
@@ -219,50 +218,93 @@ exports.registerUser = async(req,res)=>{
 	if( email_rec.length > 0 || email_rec === undefined ) return res.json( {message: `this email exists. `} );
 	
 
-	const hash = await bcrypt.hash(password, saltRounds);
+	// const hash = await bcrypt.hash(password, saltRounds); // would come back here when there is a need for the password requirement. 
 
-	const user  = new User({
+
+
+	const user_obj  = new User({
 		fname:fname,
 		lname:lname,
 		phone:phone,
 		email:email,
-		password:hash,
-		otp:otp_code,
-		otp_verified:0,
-		active:0
+		active:1
 	});
 
 	
 
-	const saved = await user.save();
-	if( !saved ) return res.json( { message:"error occurred in registering user" });
+
+
+	const saved_user = await user_obj.save();
+	if( !saved_user ) return res.json( { message:"error occurred in registering user" });
+
+
+	// setup the emergency contact
+
+
+    const contact = new Contact({
+        contacts:JSON.parse(contacts),
+        email:email
+    });
+
+
+    const saved_contact = await contact.save();
+    
+
+    if(!saved_contact) return res.json( { message:"an error occurred in setting up this user", saved:false });
+    
+
+
+
+
+
 
 	// send the verification code the user.
+
+	// const otp_data = {
+
+	// 	message: `${fname}, your Solace confirmation code is ${otp_code}.`,
+	// 	phone: `234${phone.split("").splice(1).join("")}`
+
+	// }
+
+	// const send_otp = sendOTPCode( otp_data );
+
+	// if( send_otp===true ) otp_sent = true;
+
+
+	return res.json( {message: `user has been registered successfully. `, status:true } );
+
+
+}
+exports.verifyPhoneNumber = async (req,res) => {
+
+	
+
+
+	const { phone } = req.body;
+	const otp_code = generateCode();
+	let otp_sent = false;
+	
+
+	// the next thing would be to send in the verification code
 
 
 	const otp_data = {
 
 
-		message: `${fname}, your Solace confirmation code is ${otp_code}.`,
-		phone: `234${phone.split("").splice(1).join("")}`
+		message: `Hello, your Solace confirmation code is ${otp_code}.`,
+		phone: `${phone.split("").splice(1).join("")}` // this would remove the + sign from the formatting. 
 
 	}
 
-	const send_otp = sendOTPCode( otp_data );
 
+	const send_otp = sendOTPCode( otp_data );
 	if( send_otp===true ) otp_sent = true;
 
 
-	return res.json( {message: `user has been registered successfully. `, otp_sent:otp_sent, status:true, otp_code:otp_code } );
-
-}
-exports.verifyPhoneNumber = async (req,res) => {
-
-	const { phone } = req.body;
 	const user = await getUserRec({ phone:phone });
-	if( user.length === 0 || user === undefined ) 	return res.json({ message:"Number does not exist",exist:false });
-
-	return res.json({ message:"Number found", exist:true });
+	if( user.length === 0 || user === undefined ) 	return res.json({ message:"Number does not exist",exist:false, otp_sent:otp_sent,otp_code:otp_code });
+	return res.json({ message:"Number found", exist:true, otp_sent:otp_sent,otp_code:otp_code });
 
 
 }
