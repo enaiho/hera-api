@@ -54,10 +54,9 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
   try{
 
 
-
+  	  // const response = true;
 	  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
 
-	  // const response = true;
 
 
 	  const message_info = { message:message,trigger_id:trigger_id }; 
@@ -69,7 +68,6 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 	    event:event
 
 	  });
-
 
 	  console.log( message_info );
 
@@ -201,7 +199,8 @@ exports.triggerPanicAlert = async (req,res)=>{
 exports.callTermii = async(req,res) =>{
 
 	// console.log("called termii");
-	termiiIntegration( req.body.phone, "" );
+	termiiIntegration( req.body.phone, req.body.message, "sms", "otp",""  );
+	
 }
 
 
