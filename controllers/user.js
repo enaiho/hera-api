@@ -337,7 +337,7 @@ exports.verifyPhoneNumber = async (req,res) => {
 
 	const user = await getUserRec({ phone:phone });
 	if( user.length === 0 || user === undefined ) 	return res.json({ message:"Number does not exist",exist:false, otp_sent:otp_sent,otp_code:otp_code });
-	return res.json({ message:"Number found", exist:true, otp_sent:otp_sent,otp_code:otp_code });
+	return res.json({ message:"Number founded", exist:true, otp_sent:otp_sent,otp_code:otp_code });
 
 
 }
