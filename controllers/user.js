@@ -26,6 +26,9 @@ const getContactRec = async(pl) => {
 
 const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
+
+
+
 	let data = {
 	
 	 "to":`${phone}`,
@@ -46,29 +49,44 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
   }
 
-  //const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
-
-  const response = true;
-  
-
-  if( !response ) return "ko le work";
-  
-
-  const message_info = { message:message,trigger_id:trigger_id };
-  const notify = new Notify({
-  	email:email,
-  	message_info:message_info,
-  	message_count:message.length,
-    type:type,
-    event:event
-
-  });
-
-  const save = await notify.save();
-  if( !save ) return "did not save"
 
 
-  return response.data;
+  try{
+
+
+
+	  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
+
+	  // const response = true;
+
+
+	  const message_info = { message:message,trigger_id:trigger_id }; 
+	  const notify = new Notify({
+	  	email:email,
+	  	message_info:message_info,
+	  	message_count:message.length,
+	    type:type,
+	    event:event
+
+	  });
+
+
+	  console.log( message_info );
+
+	  const save = await notify.save();
+	  if( !save ) return "did not save"
+
+
+	  return response.data;
+
+
+	}
+	catch(e){
+
+		console.log(e.message);
+		return false;
+	}
+
 
 }
 
@@ -78,7 +96,7 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 const sendOTPCode = (otp_data) => {
 
 
-	const { message, phone} = otp_data; console.log( message );
+	const { message, phone} = otp_data;
 	const sent_to_termii =  termiiIntegration( phone, message, "sms", "otp",""  );
 
 	return sent_to_termii;
@@ -114,7 +132,13 @@ exports.triggerPanicAlert = async (req,res)=>{
 	const { email,location } = req.body;
 	const payload = {email:email };
 	const user = await isUserExist(payload);
+
+
+	console.log( user );
+
+
 	const contacts = await getContactRec( payload );
+
 
 	
 	if( user.length === 0  ) return res.json( {message: "user does not exist ", status: "not_sent"} );
@@ -161,10 +185,13 @@ exports.triggerPanicAlert = async (req,res)=>{
 	const frsp_name = contacts[0].contacts[0].name;
 
 
-	const message = `[Solace] Hi ${frsp_name}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.: www.Solace.com/user-information`;
+
+	// implement the custom messaging t
+
+	const outBoundMessage = `[Solace] Hi ${frsp_name}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.: www.Solace.com/user-information`;
 		
 
-	termiiIntegration( frsp_phone, message, "sms", "trigger", email, trigger_id  );
+	termiiIntegration( frsp_phone, outBoundMessage, "sms", "trigger", email, trigger_id  );
 
 
 	return res.json( {message: "message sent successfully ", trigger_id: trigger_id, status: "sent"} );
@@ -200,6 +227,10 @@ exports.authenticateUser = async (req,res) => {
 
 
 	return res.json( { message:"user authenticated successfully. ",authenticated:true, user:usr  });
+
+
+
+
 }
 exports.registerUser = async(req,res)=>{
 
@@ -293,13 +324,16 @@ exports.verifyPhoneNumber = async (req,res) => {
 
 
 		message: `Hello, your Solace confirmation code is ${otp_code}.`,
-		phone: `${phone.split("").splice(1).join("")}` // this would remove the + sign from the formatting. 
+		phone: `${phone}` 
 
 	}
 
 
-	const send_otp = sendOTPCode( otp_data );
-	if( send_otp===true ) otp_sent = true;
+	const send_otp = await sendOTPCode( otp_data ); console.log( send_otp );
+	if( send_otp===false ) return res.status(500).json({ message:"OTP could not be sent. ",exist:false, otp_sent:otp_sent,otp_code:otp_code });
+
+
+	otp_sent = true;
 
 
 	const user = await getUserRec({ phone:phone });
@@ -338,6 +372,41 @@ exports.updateSafety = async(req,res) => {
 	catch(ex){
 		return res.json( {message: "user is not safe.. ", safe: false} );
 	}
+}
+
+exports.getUserwithPhone = async(req,res) => {
+
+
+	const { phone } = req.body;
+	const payload  = {phone:phone};
+	const user  = await getUserRec(payload);
+
+
+	if( user.length === 0 ) return res.json( {message: "phone number is incorrect. ", authenticated: false} );
+	
+
+	return res.json( { message:"record retrieved successfully. ",authenticated:true, user:user[0]  });
+}
+
+exports.updateProfile = async(req,res) => {
+
+
+	const {userId} = req.params; console.log( userId );
+	try{
+
+		const update = await User.updateOne({ _id: userId }, req.body);
+		if( update) {
+			const user = await getUserRec({ _id:userId });
+			return res.json( {message: "Profile has been updated successfully. ", status: true, user:user[0]} );
+		}
+
+		return res.json( {message: "Error occured in updating profile. ", status: false} );
+
+	}
+	catch(e){
+		return res.json( {message: e.message, status: false} );
+	}
+
 }
 
 

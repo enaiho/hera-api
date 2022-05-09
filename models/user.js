@@ -8,10 +8,14 @@ const userSchema = new Schema({
 	lname:String,
 	phone: String,
 	email: String,
+	gender:String,
+	bloodGroup:String,
+	message:String,
 	password:String,
 	otp:String,
 	otp_verified:Number,
 	active:Number
+
 
 },{ timestamps:true });
 
