@@ -58,6 +58,8 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 	  const response = await axios.post('https://api.ng.termii.com/api/sms/send',data,headers);
 
 
+	  console.log( response );
+
 
 	  const message_info = { message:message,trigger_id:trigger_id }; 
 	  const notify = new Notify({
@@ -69,6 +71,8 @@ const termiiIntegration = async (phone,message,type,event,email,trigger_id) => {
 
 	  });
 
+
+	  console.log( response );
 	  console.log( message_info );
 
 	  const save = await notify.save();
