@@ -134,7 +134,7 @@ exports.triggerPanicAlert = async (req,res)=>{
 	const user = await isUserExist(payload);
 
 
-	console.log( user );
+	// console.log( user );
 
 
 	const contacts = await getContactRec( payload );
@@ -185,7 +185,6 @@ exports.triggerPanicAlert = async (req,res)=>{
 	const frsp_name = contacts[0].contacts[0].name;
 
 
-
 	// implement the custom messaging t
 
 	const outBoundMessage = `[Solace] Hi ${frsp_name}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.: www.Solace.com/user-information`;
@@ -201,7 +200,7 @@ exports.triggerPanicAlert = async (req,res)=>{
 
 exports.callTermii = async(req,res) =>{
 
-	console.log("called termii");
+	// console.log("called termii");
 	termiiIntegration( req.body.phone, "" );
 }
 
@@ -309,8 +308,6 @@ exports.registerUser = async(req,res)=>{
 }
 exports.verifyPhoneNumber = async (req,res) => {
 
-	
-
 
 	const { phone } = req.body;
 	const otp_code = generateCode();
@@ -322,14 +319,12 @@ exports.verifyPhoneNumber = async (req,res) => {
 
 	const otp_data = {
 
-
 		message: `Hello, your Solace confirmation code is ${otp_code}.`,
 		phone: `${phone}` 
-
 	}
 
 
-	const send_otp = await sendOTPCode( otp_data ); console.log( send_otp );
+	const send_otp = await sendOTPCode( otp_data );
 	if( send_otp===false ) return res.status(500).json({ message:"OTP could not be sent. ",exist:false, otp_sent:otp_sent,otp_code:otp_code });
 
 
