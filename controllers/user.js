@@ -198,8 +198,9 @@ exports.triggerPanicAlert = async (req,res)=>{
 
 exports.callTermii = async(req,res) =>{
 
-	// console.log("called termii");
-	termiiIntegration( req.body.phone, req.body.message, "sms", "otp",""  );
+
+	const egg = termiiIntegration( req.body.phone, req.body.message, "sms", "otp",""  );
+	return res.json({ message:egg });
 	
 }
 
