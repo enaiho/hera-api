@@ -11,6 +11,7 @@ const userSchema = new Schema({
 	gender:String,
 	bloodGroup:String,
 	message:String,
+	pushToken:String,
 	password:String,
 	otp:String,
 	otp_verified:Number,

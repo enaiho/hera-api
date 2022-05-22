@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const triggerSchema = new Schema({
 
     email:String,
-    safety_status:Number
+    safety_status:Number,
+    instances:Object
 
 },{ timestamps:true });
 

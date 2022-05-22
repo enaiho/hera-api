@@ -4,7 +4,12 @@ const locationSchema = new Schema({
 
     email:String,
     location:String,
-    trigger_id:String
+    trigger_id:String,
+    instance_id:String,
+    battery_id:{
+    	type: mongoose.Schema.Types.ObjectId, ref: "Battery"
+    },
+    reverse_geodata:Object
 
 },{ timestamps:true });
 
