@@ -17,12 +17,11 @@ class Notification{
 		try{
 
 
-			const response = { message_id: "message_id", sent: "ok" };
+			// const response = { message_id: "message_id", sent: "ok" };
+			// console.log( message );
 
-			console.log( message );
 
-
-			// const response = smsIntegration.send( data);
+			const response = smsIntegration.send( data);
 			const { message_id,sent  } = response;
 
 
