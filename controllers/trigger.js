@@ -92,10 +92,9 @@ exports.updateSafety = async(req,res) => {
 			"dependencies":[Dao]
 		}
 		const update = await TriggerService.updateTriggerSafety(triggerResourceParams);
-		if( update === 1 ) return res.json( {message: "user is safe.. ", safe: true} );
+		if( update === 1 || update === 0 ) return res.json( {message: "user is safe.. ", safe: true} );
 
-
-		return res.json( {message: "user is not safe.. ", safe: false} );
+		return res.json( {message: "exception occured in updating this user. ", safe: false} );
 
 	}
 	catch(ex){
