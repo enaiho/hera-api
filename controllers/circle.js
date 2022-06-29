@@ -20,7 +20,6 @@ exports.createCircle = async(req,res)=>{
     if(!saved) return res.json( { message:"error occurred in saving circle" });
 
     return res.json( { message:"circle has been saved successfully. " });
-
 }
 exports.addMemberToCircle = async(req,res)=>{
 
@@ -32,15 +31,11 @@ exports.addMemberToCircle = async(req,res)=>{
 
     if(!saved) return res.json( { message:"member has been added to circle" });
     return res.json( { message:"circle has been saved successfully. " });
-
 }
-
 exports.createEmergencyContact = async(req,res)=> {
 
 
     const { contacts,email } = req.body;
-
-
     const contact = new Contact({
         contacts:JSON.parse(contacts),
         email:email
@@ -52,7 +47,4 @@ exports.createEmergencyContact = async(req,res)=> {
 
     if(!saved) return res.json( { message:"an error occurred in saving contact", saved:false });
     return res.json( { message:"Emergency contact has been created successfully. ",saved:true });    
-
-
-
 }

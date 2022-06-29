@@ -3,15 +3,6 @@ const {Expo} = require("expo-server-sdk");
 const SolacePNService = (pushTokens) => {
 
 
-	// console.log( pushTokens );
-	// return;
-
-
-	// console.log( somePushTokens );
-	// return;
-
-
-
 	// Create a new Expo SDK client
 	// optionally providing an access token if you have enabled push security
 
@@ -21,12 +12,10 @@ const SolacePNService = (pushTokens) => {
 	// Create the messages that you want to send to clients
 	let messages = [];
 
+
+
 	// const somePushTokens = await getPushTokens();
-
-
 	// console.log( somePushTokens );
-
-
 	// console.log( expo );
 
 
@@ -73,9 +62,8 @@ const SolacePNService = (pushTokens) => {
 	})();
 
 
+	
 
 }
 
-
 module.exports = SolacePNService; 
-

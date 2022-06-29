@@ -5,12 +5,14 @@ const bodyParser = require("body-parser");
 const userRoutes = require("./routes/user");
 const indexRoutes = require("./routes/index");
 const circleRoutes = require("./routes/circle");
+const triggerRoutes = require("./routes/trigger");
+const SOLACE_CONFIG = require("./utils/solace_config");
 const mongoose = require("mongoose");
 const app = express();
 const server = require("http").createServer(app);
-const DB_URI = 'mongodb+srv://sabiplay_user:R2kMcuhqb52MVwjp@cluster-sabiplay.vr22h.mongodb.net/HeraDB?retryWrites=true&w=majority';
-// const io = require("socket.io")(server,{ cors:{ origin:"*" } });
 
+
+const DB_URI = SOLACE_CONFIG.DB_URI;
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,6 +23,8 @@ app.options('*', cors());
 app.use("/", indexRoutes);
 app.use("/user", userRoutes);
 app.use("/circle", circleRoutes);
+app.use("/trigger", triggerRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;
@@ -39,14 +43,6 @@ mongoose.connect(DB_URI)
 	console.error( err );
 
 });
-
-
-// io.on("connection", (socket) => {
-// 	console.log( socket.id );
-
-// });
-
-
 
 
 
