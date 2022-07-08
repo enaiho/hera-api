@@ -7,6 +7,7 @@ const Contact = require("../models/contact");
 const Battery = require("../models/battery");
 const Instance = require("../models/instance");
 const Trigger = require("../models/trigger");
+const IncidentOptions = require("../models/incident_options");
 const SolacePNService = require("../services/push_notification");
 const SOLACE_CONFIG = require("../utils/solace_config");
 const SmsIntegration = require("../utils/sms_integration");
@@ -18,8 +19,6 @@ const TriggerService = require("../services/trigger_service");
 
 
 const { GEO_APIKEY,MAPS_API,SOLACE_DOMAIN } = SOLACE_CONFIG;
-
-
 const geolocation = new Geolocation();
 
 
@@ -48,13 +47,12 @@ exports.triggerPanicAlert = async (req,res)=>{
 		const triggerResourceParams = {
 
 			"requestBody":req.body,
-			"models":[Trigger,Instance,Battery,Location,User,Contact],
+			"models":[Trigger,Instance,Battery,Location,User,Contact,IncidentOptions],
 			"dependencies":[Geolocation,Dao,Notification]
 		}
 
 		const createTriggerPanic = await TriggerService.createPanicAlertResource(triggerResourceParams);
 		return res.json( createTriggerPanic );
-
 
 	}
 	catch(e){

@@ -6,6 +6,7 @@ const userRoutes = require("./routes/user");
 const indexRoutes = require("./routes/index");
 const circleRoutes = require("./routes/circle");
 const triggerRoutes = require("./routes/trigger");
+const incidentRoutes = require("./routes/incident");
 const SOLACE_CONFIG = require("./utils/solace_config");
 const mongoose = require("mongoose");
 const app = express();
@@ -24,6 +25,7 @@ app.use("/", indexRoutes);
 app.use("/user", userRoutes);
 app.use("/circle", circleRoutes);
 app.use("/trigger", triggerRoutes);
+app.use("/incident", incidentRoutes);
 
 
 

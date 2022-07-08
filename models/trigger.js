@@ -6,7 +6,9 @@ const triggerSchema = new Schema({
 
     email:String,
     safety_status:Number,
-    instances:Object
+    instances:Object,
+    incidentId:String,
+    incidentMessage:String
 
 },{ timestamps:true });
 

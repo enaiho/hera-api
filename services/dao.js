@@ -11,6 +11,8 @@ class Dao{
 		return saved;
 	}
 	static async get( model,payload ){
+
+		if( payload === null || payload === undefined || payload === "" ) payload = {};
 		const data = await model.find(payload).exec();
 		return data;
 	}

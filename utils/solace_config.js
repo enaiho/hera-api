@@ -16,5 +16,4 @@ const SOLACE_CONFIG = {
 }
 
 
-
 module.exports = SOLACE_CONFIG;

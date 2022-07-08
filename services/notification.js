@@ -37,7 +37,6 @@ class Notification{
 
 
 
-
 		}
 		catch(e){ 
 			return { message: e.message, status: false   };

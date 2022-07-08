@@ -63,9 +63,17 @@ class TriggerService{
 			transaction.update( "Location", locationId, updateData );
 
 
+
+
+
+
+
+
 		    const final = await transaction.run();
 
-		    console.log( triggerId );
+
+
+		    // console.log( triggerId );
 			
 
 		    if( final ) return {message: "message sent successfully ", triggerId: triggerId.toString(), status: "sent"};
@@ -94,7 +102,7 @@ class TriggerService{
 
 
 		const { requestBody,models,dependencies } = triggerResourceParams;
-		const [Trigger,Instance,Battery,Location,User,Contact] = models;
+		const [Trigger,Instance,Battery,Location,User,Contact,IncidentOptions] = models;
 		const [ Geolocation,Dao,Notification ] = dependencies;
 		const { email } = requestBody;
 
@@ -105,6 +113,8 @@ class TriggerService{
 
 			const user = await Dao.get(User, { email:email } );
 			const contacts = await Dao.get(Contact, { email:email } );
+			const incidents = await Dao.get(IncidentOptions);
+
 
 
 			if( user.length === 0   ) return  {message: "user does not exist ", status: "not_sent"};
@@ -112,8 +122,14 @@ class TriggerService{
 
 
 			const {  fname,lname,phone  } = user[0];
-			const frsp_phone = contacts[0].contacts[0].phone;
 			const frsp_name = contacts[0].contacts[0].name;
+			let frsp_phone = contacts[0].contacts[0].phoneNumbers[0].number;
+			frsp_phone = frsp_phone.replace(/\s/g, '');
+
+			if( frsp_phone.indexOf("+") > -1 ) frsp_phone = frsp_phone.slice(1,frsp_phone.length) ;
+
+
+			// console.log(frsp_phone);
 
 
 			const outBoundMessage = `[Solace] Hi ${frsp_name}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.:  ${SOLACE_CONFIG.SOLACE_DOMAIN}/emergency/${triggerId} `;
@@ -123,12 +139,16 @@ class TriggerService{
 			if( sendTriggerMessage["status"] === false ) return {message: sendTriggerMessage["message"], status: "not sent"};
 
 
+			return {message: "panic alert has been triggered successfully. ", status: "sent", trigger_id:triggerId, incidents: incidents};
+
+
 		}
 		catch(e){
 			return {message: e.message, status: "not sent"};
 		}
 
-		return {message: "panic alert has been triggered successfully. ", status: "sent", trigger_id:triggerId};
+		return {message: "error occurred in triggering panic alert. ", status: "not sent"};
+
 	}
 	static async createPanicInstanceResource(triggerResourceParams){
 
