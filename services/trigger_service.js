@@ -55,7 +55,7 @@ class TriggerService{
 			const locationId = transaction.insert( "Location", {email:email,location:location,trigger_id:triggerId,instance_id: instanceId,battery_id: batteryId,reverse_geodata:""});
 
 
-			const resolveStatus = geolocation.resolveGeoLocation(location);
+			const resolveStatus = await geolocation.resolveGeoLocation(location);
 			if( resolveStatus === false ) return { message:"There was an error in resolving the geo location data. ", status:"" };
 
 
@@ -64,16 +64,9 @@ class TriggerService{
 
 
 
-
-
-
-
-
 		    const final = await transaction.run();
 
 
-
-		    // console.log( triggerId );
 			
 
 		    if( final ) return {message: "message sent successfully ", triggerId: triggerId.toString(), status: "sent"};

@@ -87,14 +87,15 @@ exports.getEmergencyDetails = async(req,res) => {
 		const computeLocations = (location,index) => {
 
 
-			// console.log( JSON.stringify( location ) );
+			console.log( location );
+
+			return;
 			
 
-			const { plus_code,results,status } = location.reverse_geodata;
+
 			const { batteryLevel,batteryState,lowPowerMode } = JSON.parse(location.battery_id.battery_details);
+			const { plus_code,results,status } = location.reverse_geodata;
 
-
-			// console.log( location.battery_id.battery_details ); 
 
 
 
@@ -116,8 +117,9 @@ exports.getEmergencyDetails = async(req,res) => {
 			locationData["battery"].batteryState = (batteryState === 0 ? "DEVICE UNPLUGGED":"DEVICE PLUGGED");
 
 
-
 			processedEmergencyData[index] =  locationData;
+
+
 
 
 		}

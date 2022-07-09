@@ -11,10 +11,10 @@ class GeoLocation{
 	constructor(){
 	}
 
-	resolveGeoLocation(location){
+	async resolveGeoLocation(location){
 
 
-		if( location === undefined || location === "" || location.toString() === "{}" ) return "cannot resolve. ";
+		if( location === undefined || location === "" || location.toString() === "{}" ) return false;
 
 
 		const coordinates = JSON.parse(location);
@@ -23,14 +23,7 @@ class GeoLocation{
 
 
 
-		// if( lat === "" ) return res.json({message: "Latitude coordinate cannot be empty. "});
-		// if(  lng === ""  ) return res.json({message: "Longitude cannot be empty. "});
-
-
 		const latlng = `${lat},${lng}`;
-
-
-		// console.log( latlng );
 
 
 		const options = {
@@ -40,13 +33,15 @@ class GeoLocation{
 		};
 
 
+
 		try{
 			
 
-			const response = useHttpOptions(options);
+			const response = await useHttpOptions(options);
 			return response.data;
 
 			// update the location guy
+
 
 			
 		}
