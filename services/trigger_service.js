@@ -23,14 +23,14 @@ class TriggerService{
 
 
 
-
 		const payload = {email:email };
 		const geolocation = new Geolocation();
 
 
-
 		try{
+
 		
+
 			if( triggerId === "" || triggerId === undefined ) triggerId= transaction.insert( "Trigger", { email:email,safety_status:0,instances:[]});
 			  
 
@@ -38,13 +38,12 @@ class TriggerService{
 		    let triggerInstances = await Dao.get( Trigger, { _id:triggerId } );
 
 
-
 		    if( triggerInstances.length === 0 ) triggerInstances.push(instanceId.toString());
 		    else{
 		    	triggerInstances = triggerInstances[0].instances;
 		    	triggerInstances.push(instanceId.toString());
 		    }
-			
+
 
 			const updateInstancesBody = { instances:triggerInstances };
 
@@ -63,9 +62,7 @@ class TriggerService{
 			transaction.update( "Location", locationId, updateData );
 
 
-
 		    const final = await transaction.run();
-
 
 			
 

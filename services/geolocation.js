@@ -58,4 +58,3 @@ class GeoLocation{
 
 
 module.exports = GeoLocation;
-

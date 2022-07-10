@@ -29,7 +29,7 @@ exports.getEmergencyDetails = async(req,res) => {
 
 	try{
 
-		const triggers = await Dao.get( Trigger,payload );
+		const triggers = await Dao.get( Trigger,trigger_pl );
 		if( triggers.length === 0 ) return res.json({ message:"Unable to load data. It appears that the trigger id is not correct. "  });		
 
 
@@ -49,21 +49,21 @@ exports.getEmergencyDetails = async(req,res) => {
 
 		const { fname,lname,phone } = userRec[0];
 
+
+		// console.log( triggers );
+
 		const userData = {
 
 
 			name: `${fname} ${lname}`,
-			phone: phone
+			phone: phone,
+			triggerMessage:triggers[0].incidentMessage  // this is the extra message that 
 
 
 		}
 
 
-
 		// console.log( locations );
-
-
-
 		// if( locations.length === 0 ) return res.json({ message: "battery and location length should jive. " });
 
 		/*
@@ -85,17 +85,11 @@ exports.getEmergencyDetails = async(req,res) => {
 		};
 			
 		const computeLocations = (location,index) => {
-
-
-			console.log( location );
-
-			return;
 			
 
 
 			const { batteryLevel,batteryState,lowPowerMode } = JSON.parse(location.battery_id.battery_details);
 			const { plus_code,results,status } = location.reverse_geodata;
-
 
 
 

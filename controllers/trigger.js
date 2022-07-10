@@ -32,15 +32,15 @@ exports.cronTriggerPanicAlert = async(req,res) => {
 	}
 	const pushTokens =  await TriggerService.getPushTokensForCron(triggerResourceParams);
 	const pnSolaceService =  SolacePNService( pushTokens );
-	
 
+
+	// console.log( pushTokens );
 	// loop through the pushTokens and construct the message to submit all the trigger instances to the users
 
 
 	return res.json({message: "schedule has been triggered "});
 }
 exports.triggerPanicAlert = async (req,res)=>{
-
 
 	try{
 
