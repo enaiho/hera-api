@@ -14,6 +14,7 @@ const SmsIntegration = require("../utils/sms_integration");
 const Notification = require("../services/notification");
 const Geolocation = require("../services/geolocation");
 const Dao = require("../services/dao");
+const {cleanPhoneNumber} = require("../utils/helper");
 
 
 const saltRounds = 10;
@@ -82,7 +83,6 @@ exports.registerUser = async(req,res)=>{
 
 	
 
-
 	const saved_user = await user_obj.save();
 	if( !saved_user ) return res.json( { message:"error occurred in registering user" });
 
@@ -137,6 +137,139 @@ exports.updateProfile = async(req,res) => {
 		return res.json( {message: e.message, status: false} );
 	}
 }
+exports.getDependents = async(req,res) => {
 
 
+	// get the phone number of the user
+	// use the phone number to search within the contacts array
+	// establish all of the user that we are able to find
+	// return an array of items/payload of the user for that guy. 
+
+
+	const {phoneNumber} = req.body;
+	const allContactList = await Dao.get(Contact);
+	const arrDependents = [];
+	
+
+	try{
+
+
+		if( allContactList.length === 0  ) return res.status(200).json({ message: "This user doesn't have any dependent. ", dependents:arrDependents });
+
+
+		for( const contactList of allContactList  ){
+
+
+			const phoneNumbers = contactList.contacts[0].phoneNumbers;
+			const email = contactList.email;
+
+
+			for( const rec of phoneNumbers ){
+
+
+				if( rec.number === null || rec.number === undefined ) continue;
+
+
+				const number = cleanPhoneNumber( rec.number);
+				if( number.substring( number.length-4 ) !== phoneNumber.substring(phoneNumber.length-4)  ) continue;
+
+
+				// we have to get the user based on the email
+
+				const userObjectPayload = { email:email };
+				const user = await Dao.get( User,userObjectPayload );
+
+
+				if( user.length === 0 ) return res.status(200).json({ message: "user record does not exist. ",dependents:arrDependents });
+
+
+				const { fname,lname,phone,_id } = user[0];
+				const dependentObject = {
+					"firstName":fname,
+					"lastName":lname,
+					"phoneNumber":phone,
+					"userId":_id.toString()
+				};
+
+				arrDependents.push(dependentObject);
+				break;
+
+
+			}
+
+		}
+
+		return res.status(200).json({ message:"Loaded dependents.  ", dependents:arrDependents  });
+
+	}
+	catch(ex){
+
+		// console.log( ex );
+		// console.log( "error ");
+
+		return res.status(500).json({ message:ex.message, dependents:[]  });
+
+	}
+
+}
+exports.deleteDependent = async(req,res) => {
+
+
+
+	const { userId } = req.params;
+	const { email,dependentPhone } = req.body;
+	const payload = { email:email,_id:userId };
+
+
+	try{
+
+		const contactList = await Dao.get(Contact,payload);
+
+
+		const phoneNumbers = contactList[0].contacts[0].phoneNumbers;
+		if( phoneNumbers.length === 0 ) return res.status(200).json({ message:"Dependent could not be deleted",status:true } );
+
+
+		for( const [index,rec] of phoneNumbers.entries() ){
+
+
+			if( rec.number === null || rec.number === undefined || rec.number === "" ) continue;
+
+
+			const number = cleanPhoneNumber(rec.number);
+			if( number.substring( number.length-4 ) === dependentPhone.substring(dependentPhone.length-4)  ){
+
+
+				phoneNumbers.splice(index,1); // remove the item from the array ...
+				contactList[0].contacts[0].phoneNumbers = phoneNumbers; // reupdate the phoneNumbers array into the system.
+
+
+				// update the new contact lists
+
+
+				const updateCondition = { email:email }; 
+				const updateBody = { contacts:contactList }
+				const updateContact = await Dao.updateOne(Contact,updateCondition,updateBody);
+
+
+				if( updateContact ) return res.status(200).json( { message:"Dependent has been deleted successfully. ", status:true } );
+
+
+			}
+
+		}
+
+
+		return res.status(200).json( { message:"Error in deleting the dependent contact. ", status:false } );
+
+
+	}
+	catch(ex){
+		return res.status(500).json({ message:ex.message, status:false });
+	}
+
+
+
+
+}
 
