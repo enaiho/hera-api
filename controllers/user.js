@@ -216,17 +216,25 @@ exports.deleteDependent = async(req,res) => {
 
 
 
-	const { email,dependentPhone } = req.params;
-	const payload = { email:email };
+	const { phoneNumber,dependentPhone } = req.params;
+	const payloadUser = { phone:phoneNumber };
 
 
 	try{
 
+
+		
+		const user = await Dao.get(User,payloadUser);
+		if( user.length === 0 ) return res.status(200).json({ message:"Couldn't find details for this user. ",status:false } );
+
+
+		const payload = { email:user[0].email };
+
+
 		const contactList = await Dao.get(Contact,payload);
 
-
 		const phoneNumbers = contactList[0].contacts[0].phoneNumbers;
-		if( phoneNumbers.length === 0 ) return res.status(200).json({ message:"Dependent could not be deleted",status:true } );
+		if( phoneNumbers.length === 0 ) return res.status(200).json({ message:"Dependent could not be deleted",status:false } );
 
 
 		for( const [index,rec] of phoneNumbers.entries() ){
