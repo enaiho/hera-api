@@ -9,8 +9,8 @@ router.post("/authenticate",userController.authenticateUser);
 router.post("/register",userController.registerUser);
 router.post("/get_rec_phone", userController.getUserwithPhone);
 router.put("/update_profile/:userId", userController.updateProfile);
-router.get("/dependents",userController.getDependents);
-router.delete("/delete_dependent/:userId", userController.deleteDependent);
+router.get("/dependents/:phoneNumber",userController.getDependents);
+router.delete("/delete_dependent/:userId/:email/:dependentPhone", userController.deleteDependent);
 
 
 module.exports = router;

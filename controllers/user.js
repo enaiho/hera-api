@@ -146,7 +146,7 @@ exports.getDependents = async(req,res) => {
 	// return an array of items/payload of the user for that guy. 
 
 
-	const {phoneNumber} = req.body;
+	const {phoneNumber} = req.params;
 	const allContactList = await Dao.get(Contact);
 	const arrDependents = [];
 	
@@ -216,8 +216,7 @@ exports.deleteDependent = async(req,res) => {
 
 
 
-	const { userId } = req.params;
-	const { email,dependentPhone } = req.body;
+	const { userId,email,dependentPhone } = req.params;
 	const payload = { email:email,_id:userId };
 
 
@@ -267,8 +266,6 @@ exports.deleteDependent = async(req,res) => {
 	catch(ex){
 		return res.status(500).json({ message:ex.message, status:false });
 	}
-
-
 
 
 }
