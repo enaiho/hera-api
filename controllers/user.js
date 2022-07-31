@@ -227,8 +227,8 @@ exports.deleteDependent = async(req,res) => {
 		const user = await Dao.get(User,payloadUser);
 		if( user.length === 0 ) return res.status(200).json({ message:"Couldn't find details for this user. ",status:false } );
 
-
-		const payload = { email:user[0].email };
+		const email = user[0].email;
+		const payload = { email:email };
 
 
 		const contactList = await Dao.get(Contact,payload);
