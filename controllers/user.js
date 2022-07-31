@@ -216,8 +216,8 @@ exports.deleteDependent = async(req,res) => {
 
 
 
-	const { userId,email,dependentPhone } = req.params;
-	const payload = { email:email,_id:userId };
+	const { email,dependentPhone } = req.params;
+	const payload = { email:email };
 
 
 	try{
