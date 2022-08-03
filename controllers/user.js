@@ -146,53 +146,78 @@ exports.getDependents = async(req,res) => {
 	// return an array of items/payload of the user for that guy. 
 
 
-	const {phoneNumber} = req.params;
-	const allContactList = await Dao.get(Contact);
-	const arrDependents = [];
-	
 
+	/*
+	when I add you as an EC, the EC once registered sees me as a dependent
+	*/
+
+
+	const {phoneNumber} = req.params;
+	const arrDependents = [];
+
+
+	
 	try{
 
-
+		const allContactList = await Dao.get(Contact);
 		if( allContactList.length === 0  ) return res.status(200).json({ message: "This user doesn't have any dependent. ", dependents:arrDependents });
+
+
+
+
+
 
 
 		for( const contactList of allContactList  ){
 
 
-			const phoneNumbers = contactList.contacts[0].phoneNumbers;
 			const email = contactList.email;
+			const contacts = contactList.contacts; // this guy is an array
 
 
-			for( const rec of phoneNumbers ){
+			if( contacts.length === 0  ) continue;
 
 
-				if( rec.number === null || rec.number === undefined ) continue;
+			for( const contact of contacts  ){
+			
+
+				const phoneNumbers = contact.phoneNumbers;
+				if( phoneNumbers.length === 0 ) continue;
 
 
-				const number = cleanPhoneNumber( rec.number);
-				if( number.substring( number.length-4 ) !== phoneNumber.substring(phoneNumber.length-4)  ) continue;
+				for( const rec of phoneNumbers ){
 
 
-				// we have to get the user based on the email
-
-				const userObjectPayload = { email:email };
-				const user = await Dao.get( User,userObjectPayload );
+					if( rec.number === null || rec.number === undefined ) continue;
 
 
-				if( user.length === 0 ) return res.status(200).json({ message: "user record does not exist. ",dependents:arrDependents });
+					const number = cleanPhoneNumber( rec.number);
+					if( number.substring( number.length-4 ) !== phoneNumber.substring(phoneNumber.length-4)   ) continue;
 
 
-				const { fname,lname,phone,_id } = user[0];
-				const dependentObject = {
-					"firstName":fname,
-					"lastName":lname,
-					"phoneNumber":phone,
-					"userId":_id.toString()
-				};
 
-				arrDependents.push(dependentObject);
-				break;
+					const userObjectPayload = { email:email };
+					const user = await Dao.get( User,userObjectPayload );
+
+
+					if( user.length === 0 ) return res.status(200).json({ message: "user record does not exist. ",dependents:arrDependents });
+
+					const { fname,lname,phone,_id } = user[0];
+
+					if( phoneNumber.substring( phoneNumber.length-4 ) === phone.substring(phone.length-4) ) continue; // edge case if the user selected self as emergency contact.
+
+					const dependentObject = {
+						"firstName":fname,
+						"lastName":lname,
+						"phoneNumber":phone,
+						"userId":_id.toString()
+					};
+
+					arrDependents.push(dependentObject);
+					break;
+
+				}
+
 
 
 			}
@@ -222,10 +247,10 @@ exports.deleteDependent = async(req,res) => {
 
 	try{
 
-
 		
 		const user = await Dao.get(User,payloadUser);
 		if( user.length === 0 ) return res.status(200).json({ message:"Couldn't find details for this user. ",status:false } );
+
 
 		const email = user[0].email;
 		const payload = { email:email };
@@ -233,36 +258,52 @@ exports.deleteDependent = async(req,res) => {
 
 		const contactList = await Dao.get(Contact,payload);
 
-		const phoneNumbers = contactList[0].contacts[0].phoneNumbers;
-		if( phoneNumbers.length === 0 ) return res.status(200).json({ message:"Dependent could not be deleted",status:false } );
+
+		const contacts = contactList[0].contacts; // all the contacts listed here is an array
+		if( contacts.length === 0 ) return res.status(200).json({ message:"There is no contact to be deleted", status:false });
 
 
-		for( const [index,rec] of phoneNumbers.entries() ){
+		for(const [firstIndex,contact] of contacts.entries()  ){
+
+			
+			const phoneNumbers = contact.phoneNumbers;
+			if( phoneNumbers.length === 0 ) return res.status(200).json({ message:"Dependent could not be deleted because phone number not found. ",status:false } );
 
 
-			if( rec.number === null || rec.number === undefined || rec.number === "" ) continue;
+			for( const [index,rec] of phoneNumbers.entries() ){
 
 
-			const number = cleanPhoneNumber(rec.number);
-			if( number.substring( number.length-4 ) === dependentPhone.substring(dependentPhone.length-4)  ){
+				if( rec.number === null || rec.number === undefined || rec.number === "" ) continue;
 
 
-				phoneNumbers.splice(index,1); // remove the item from the array ...
-				contactList[0].contacts[0].phoneNumbers = phoneNumbers; // reupdate the phoneNumbers array into the system.
+				const number = cleanPhoneNumber(rec.number);
+				if( number.substring( number.length-4 ) === dependentPhone.substring(dependentPhone.length-4)  ){
 
 
-				// update the new contact lists
+
+					contacts.splice(firstIndex,1);
 
 
-				const updateCondition = { email:email }; 
-				const updateBody = { contacts:contactList }
-				const updateContact = await Dao.updateOne(Contact,updateCondition,updateBody);
+
+					// phoneNumbers.splice(index,1); // remove the item from the array ...
+					// contactList[0].contacts[0].phoneNumbers = phoneNumbers; // reupdate the phoneNumbers array into the system.
+					// update the new contact lists
 
 
-				if( updateContact ) return res.status(200).json( { message:"Dependent has been deleted successfully. ", status:true } );
+					const updateCondition = { email:email }; 
+					const updateBody = { contacts:contacts }
+					const updateContact = await Dao.updateOne(Contact,updateCondition,updateBody);
 
+
+					if( updateContact ) return res.status(200).json( { message:"Dependent has been deleted successfully. ", status:true } );
+
+
+				}
 
 			}
+
+
+
 
 		}
 
