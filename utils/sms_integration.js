@@ -31,7 +31,6 @@ class SmsIntegration{
 			console.log( response.data );
 
 
-
 			const { code,message_id  } = response.data;
 
 
@@ -39,8 +38,6 @@ class SmsIntegration{
 
 
 			return { message_id:null, sent:"not_ok" };
-
-
 
 		}
 		catch(e){

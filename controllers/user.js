@@ -165,9 +165,6 @@ exports.getDependents = async(req,res) => {
 
 
 
-
-
-
 		for( const contactList of allContactList  ){
 
 
@@ -196,6 +193,7 @@ exports.getDependents = async(req,res) => {
 
 
 
+
 					const userObjectPayload = { email:email };
 					const user = await Dao.get( User,userObjectPayload );
 
@@ -204,17 +202,22 @@ exports.getDependents = async(req,res) => {
 
 					const { fname,lname,phone,_id } = user[0];
 
-					if( phoneNumber.substring( phoneNumber.length-4 ) === phone.substring(phone.length-4) ) continue; // edge case if the user selected self as emergency contact.
 
-					const dependentObject = {
-						"firstName":fname,
-						"lastName":lname,
-						"phoneNumber":phone,
-						"userId":_id.toString()
-					};
+					if( phoneNumber.substring( phoneNumber.length-4 ) === phone.substring(phone.length-4) ){
 
-					arrDependents.push(dependentObject);
-					break;
+						const dependentObject = {
+							"firstName":fname,
+							"lastName":lname,
+							"phoneNumber":phone,
+							"userId":_id.toString()
+						};
+
+						arrDependents.push(dependentObject);
+						break;
+
+					}
+
+
 
 				}
 
@@ -281,8 +284,8 @@ exports.deleteDependent = async(req,res) => {
 
 
 
-					contacts.splice(firstIndex,1);
 
+					contacts.splice(firstIndex,1);
 
 
 					// phoneNumbers.splice(index,1); // remove the item from the array ...
