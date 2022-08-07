@@ -311,7 +311,7 @@ exports.deleteDependent = async(req,res) => {
 		}
 
 
-		return res.status(200).json( { message:"Error in deleting the dependent contact. ", status:false } );
+		return res.status(200).json( { message:"Error in deleting the dependent contact as this dependent no longer exist. ", status:false } );
 
 
 	}
