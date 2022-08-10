@@ -27,6 +27,9 @@ class Notification{
 			const { message_id,sent  } = response;
 
 
+			console.log( response );
+
+
 			const message_info = { message:message,message_id:message_id,sent:sent };
 			const payload = {phone:phone,message_info:message_info,message_count:message.length,type:"sms",event:event};
 			const logged = await this.logNotification(payload);
