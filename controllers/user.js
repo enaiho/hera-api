@@ -295,7 +295,7 @@ exports.deleteDependent = async(req,res) => {
 
 
 	const { phoneNumber,dependentPhone } = req.params;
-	const payloadUser = { phone:phoneNumber };
+	const payloadUser = { phone:dependentPhone };
 
 
 	try{
@@ -309,11 +309,21 @@ exports.deleteDependent = async(req,res) => {
 		const payload = { email:email };
 
 
+
 		const contactList = await Dao.get(Contact,payload);
+
+
+		// console.log( contactList );
+		// return;
+
 
 
 		const contacts = contactList[0].contacts; // all the contacts listed here is an array
 		if( contacts.length === 0 ) return res.status(200).json({ message:"There is no contact to be deleted", status:false });
+
+
+
+
 
 
 		for(const [firstIndex,contact] of contacts.entries()  ){
@@ -330,9 +340,12 @@ exports.deleteDependent = async(req,res) => {
 
 
 				const number = cleanPhoneNumber(rec.number);
-				if( number.substring( number.length-4 ) === dependentPhone.substring(dependentPhone.length-4)  ){
+				if( number.substring( number.length-4 ) === phoneNumber.substring(phoneNumber.length-4)  ){
 
 
+
+					// console.log( "testing bug" );
+					// return;
 
 
 					contacts.splice(firstIndex,1);
@@ -354,9 +367,6 @@ exports.deleteDependent = async(req,res) => {
 				}
 
 			}
-
-
-
 
 		}
 
