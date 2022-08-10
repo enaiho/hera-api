@@ -20,7 +20,23 @@ const cleanPhoneNumber = (string) => {
 	}
 
 
-	return newString;
+
+	let counterIndex = 0;
+	let reversedString = "";
+	for( let i=newString.length-1; i>0; i--  ){
+
+		if( counterIndex === 10 ) break;
+
+		reversedString = `${reversedString}${newString[i]}`;
+		counterIndex++;
+
+	}
+
+	reversedString = `234${reversedString.split("").reverse().join("")}`;
+
+	return reversedString;
+
+
 }
 
 
