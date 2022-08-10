@@ -14,7 +14,9 @@ const cleanPhoneNumber = (string) => {
 	let newString = "";
 	for( const char of string ){
 
-		if( char !== " " ) newString = `${ newString }${char}`;
+
+		if( char === "+" ) continue;
+		if( char !== " ") newString = `${ newString }${char}`;
 	}
 
 
