@@ -206,6 +206,9 @@ exports.getDependents = async(req,res) => {
 
 
 
+
+
+
 		for( const contactList of allContactList  ){
 
 
@@ -214,6 +217,8 @@ exports.getDependents = async(req,res) => {
 
 
 			if( contacts.length === 0  ) continue;
+
+
 
 
 			for( const contact of contacts  ){
@@ -235,6 +240,12 @@ exports.getDependents = async(req,res) => {
 
 
 
+
+					// console.log( number );
+					// console.log( email );
+					// return;
+
+
 					const userObjectPayload = { email:email };
 					const user = await Dao.get( User,userObjectPayload );
 
@@ -242,21 +253,19 @@ exports.getDependents = async(req,res) => {
 					if( user.length === 0 ) return res.status(200).json({ message: "user record does not exist. ",dependents:arrDependents });
 
 					const { fname,lname,phone,_id } = user[0];
+					const dependentObject = {
+						"firstName":fname,
+						"lastName":lname,
+						"phoneNumber":phone,
+						"userId":_id.toString()
+					};
+
+					arrDependents.push(dependentObject);
+					break;
 
 
-					if( phoneNumber.substring( phoneNumber.length-4 ) === phone.substring(phone.length-4) ){
-
-						const dependentObject = {
-							"firstName":fname,
-							"lastName":lname,
-							"phoneNumber":phone,
-							"userId":_id.toString()
-						};
-
-						arrDependents.push(dependentObject);
-						break;
-
-					}
+					// if( phoneNumber.substring( phoneNumber.length-4 ) === phone.substring(phone.length-4) ){
+					// }
 
 
 
