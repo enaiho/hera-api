@@ -53,56 +53,97 @@ exports.authenticateUser = async (req,res) => {
 }
 exports.registerUser = async(req,res)=>{
 
-	// const save = await GGEntries.insertMany( sanitized_pl );
-
-	const {user,contacts,pushToken } = req.body;
-	const {fname,lname,phone,email,otp_code} = JSON.parse(user);
-	const phone_rec = await Dao.get(User,{"phone":phone});
-	const email_rec = await Dao.get(User,{"email":email});
-	let otp_sent = false;
-
-
-	if( fname === "" || fname === undefined ) return res.json( {message: `first name cannot be empty. `} );
-	if( lname === "" || lname === undefined ) return res.json( {message: `last name cannot be empty. `} );
-	if( phone_rec.length > 0 || phone_rec === undefined ) return res.json( {message: `this phone exists. `} );
-	if( email_rec.length > 0 || email_rec === undefined ) return res.json( {message: `this email exists. `} );
-	
-
-	// const hash = await bcrypt.hash(password, saltRounds); // would come back here when there is a need for the password requirement. 
 
 
 
-	const user_obj  = new User({
-		fname:fname,
-		lname:lname,
-		phone:phone,
-		email:email,
-		active:1,
-		pushToken:pushToken
-	});
+	try{
 
-	
-
-	const saved_user = await user_obj.save();
-	if( !saved_user ) return res.json( { message:"error occurred in registering user" });
+		const {user,contacts,pushToken } = req.body;
+		const {fname,lname,phone,email,otp_code} = JSON.parse(user);
+		const phone_rec = await Dao.get(User,{"phone":phone});
+		const email_rec = await Dao.get(User,{"email":email});
+		let otp_sent = false;
 
 
-	// setup the emergency contact
+		if( fname === "" || fname === undefined ) return res.json( {message: `first name cannot be empty. `} );
+		if( lname === "" || lname === undefined ) return res.json( {message: `last name cannot be empty. `} );
+		if( phone_rec.length > 0 || phone_rec === undefined ) return res.json( {message: `this phone exists. `} );
+		if( email_rec.length > 0 || email_rec === undefined ) return res.json( {message: `this email exists. `} );
+		
+
+		// const hash = await bcrypt.hash(password, saltRounds); // would come back here when there is a need for the password requirement. 
 
 
-    const contact = new Contact({
-        contacts:JSON.parse(contacts),
-        email:email
-    });
+		// so for now, I am only interested in the first contact until we have the screen that allows us  
+ 		// to have the design to select the emergency contact
 
 
-    const saved_contact = await contact.save();
-    
+		const parseContacts = JSON.parse(contacts);
+		
+		const user_obj  = new User({
+			fname:fname,
+			lname:lname,
+			phone:phone,
+			email:email,
+			active:1,
+			pushToken:pushToken
+		});
 
-    if(!saved_contact) return res.json( { message:"an error occurred in setting up this user", saved:false });
+		
+
+		const saved_user = await user_obj.save();
+		if( !saved_user ) return res.json( { message:"error occurred in registering user" });
 
 
-	return res.json( {message: `user has been registered successfully. `, status:true } );
+		// setup the emergency contact
+
+
+
+		if( parseContacts.length > 0 ){
+
+
+
+			const selectedContact = parseContacts[0];
+	 		const phoneNumbers = selectedContact.phoneNumbers;
+	 		if( phoneNumbers.length > 0 ){
+	 			const selectedPhoneNumber = cleanPhoneNumber(phoneNumbers[0].number);
+	 			const message_data = {
+
+					message: `Hello, your friend ${fname} has added you as an emergency contact on Solace.`,
+					phone: `${selectedPhoneNumber}`,
+					event: `sms`
+				}
+
+
+				const notification = new Notification();
+				const sms_response =  await notification.sendOTPCode( message_data );
+
+				const { message,status } = sms_response;
+	 			
+	 		}
+
+
+		    const contact = new Contact({
+		        contacts:JSON.parse(contacts),
+		        email:email
+		    });
+
+
+		    const saved_contact = await contact.save();
+		    if(!saved_contact) return res.json( { message:"an error occurred in setting up this user", saved:false });
+
+
+		}
+
+
+
+		return res.json( {message: `user has been registered successfully. `, status:true } );
+
+	}
+	catch(e){
+		return res.status(500).json( {message:e.message, status:false });
+	}
+
 }
 
 exports.getUserwithPhone = async(req,res) => {
