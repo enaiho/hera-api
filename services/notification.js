@@ -19,6 +19,9 @@ class Notification{
 
 
 
+			// const response = { message_id:"test_id",sent:true };
+
+
 			const response = smsIntegration.send( data); // uncomment this line when you want sms or messages to be sent
 
 

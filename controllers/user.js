@@ -14,6 +14,7 @@ const SmsIntegration = require("../utils/sms_integration");
 const Notification = require("../services/notification");
 const Geolocation = require("../services/geolocation");
 const Dao = require("../services/dao");
+const ContactFactory = require("../services/contact_factory");
 const {cleanPhoneNumber} = require("../utils/helper");
 
 
@@ -54,8 +55,6 @@ exports.authenticateUser = async (req,res) => {
 exports.registerUser = async(req,res)=>{
 
 
-
-
 	try{
 
 		const {user,contacts,pushToken } = req.body;
@@ -73,12 +72,9 @@ exports.registerUser = async(req,res)=>{
 
 		// const hash = await bcrypt.hash(password, saltRounds); // would come back here when there is a need for the password requirement. 
 
-
 		// so for now, I am only interested in the first contact until we have the screen that allows us  
  		// to have the design to select the emergency contact
 
-
-		const parseContacts = JSON.parse(contacts);
 		
 		const user_obj  = new User({
 			fname:fname,
@@ -89,53 +85,20 @@ exports.registerUser = async(req,res)=>{
 			pushToken:pushToken
 		});
 
-		
 
 		const saved_user = await user_obj.save();
 		if( !saved_user ) return res.json( { message:"error occurred in registering user" });
 
 
-		// setup the emergency contact
-
-
-
-		if( parseContacts.length > 0 ){
-
-
-
-			const selectedContact = parseContacts[0];
-	 		const phoneNumbers = selectedContact.phoneNumbers;
-	 		if( phoneNumbers.length > 0 ){
-	 			const selectedPhoneNumber = cleanPhoneNumber(phoneNumbers[0].number);
-	 			const message_data = {
-
-					message: `Hello, your friend ${fname} has added you as an emergency contact on Solace.`,
-					phone: `${selectedPhoneNumber}`,
-					event: `sms`
-				}
-
-
-				const notification = new Notification();
-				const sms_response =  await notification.sendOTPCode( message_data );
-
-				const { message,status } = sms_response;
-	 			
-	 		}
-
-
-		    const contact = new Contact({
-		        contacts:JSON.parse(contacts),
-		        email:email
-		    });
-
-
-		    const saved_contact = await contact.save();
-		    if(!saved_contact) return res.json( { message:"an error occurred in setting up this user", saved:false });
-
-
+		const contact_request_body = {email:email,phone:phone,contacts:contacts};
+		const factoryParams = {
+			"requestBody": contact_request_body,
+			"models":[Contact],
+			"dependencies":[Dao,Notification,cleanPhoneNumber]
 		}
 
-
+		const { created,message } = await ContactFactory.createEmergencyContact(factoryParams);
+		if( !created ) return res.status(200).json( {message:message, status:created} );
 
 		return res.json( {message: `user has been registered successfully. `, status:true } );
 
@@ -143,9 +106,7 @@ exports.registerUser = async(req,res)=>{
 	catch(e){
 		return res.status(500).json( {message:e.message, status:false });
 	}
-
 }
-
 exports.getUserwithPhone = async(req,res) => {
 
 
@@ -202,11 +163,6 @@ exports.getDependents = async(req,res) => {
 
 		const allContactList = await Dao.get(Contact);
 		if( allContactList.length === 0  ) return res.status(200).json({ message: "This user doesn't have any dependent. ", dependents:arrDependents });
-
-
-
-
-
 
 
 		for( const contactList of allContactList  ){
@@ -280,15 +236,14 @@ exports.getDependents = async(req,res) => {
 		return res.status(200).json({ message:"Loaded dependents.  ", dependents:arrDependents  });
 
 	}
-	catch(ex){
+	catch(e){
 
 		// console.log( ex );
 		// console.log( "error ");
 
-		return res.status(500).json({ message:ex.message, dependents:[]  });
+		return res.status(500).json({ message:e.message, dependents:[]  });
 
 	}
-
 }
 exports.deleteDependent = async(req,res) => {
 
@@ -378,7 +333,44 @@ exports.deleteDependent = async(req,res) => {
 	catch(ex){
 		return res.status(500).json({ message:ex.message, status:false });
 	}
+}
+exports.addEmergencyContact = async(req,res) => {
 
+
+	try{
+
+		const factoryParams = {
+			"requestBody":req.body,
+			"models":[Contact],
+			"dependencies":[Dao,Notification,cleanPhoneNumber]
+		}
+	
+		const { created,message } = await ContactFactory.createEmergencyContact(factoryParams);
+		return res.status(200).json( { message: message, status:created } );
+
+
+	}
+	catch(e){
+		return res.status(500).json({message:e.message});
+	}
+}
+exports.getEmergencyContact = async(req,res) => {
+
+	try{
+
+		const contactParams = {
+			"requestBody":req.params,
+			"models":[Contact],
+			"dependencies":[Dao]
+		}
+	
+		const { message,contacts } = await ContactFactory.getEmergencyContact(contactParams);		
+		return res.status(200).json( { message: message, contacts:contacts } );
+
+	}
+	catch(e){
+		return res.status(500).json({message:e.message});
+	}
 
 }
 

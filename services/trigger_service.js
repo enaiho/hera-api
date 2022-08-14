@@ -88,6 +88,9 @@ class TriggerService{
 		const { message,status,triggerId } = await TriggerService.#createPanicAlertFactory(triggerResourceParams);
 
 
+
+
+
 		if( status === false) return { message:message, status:status };
 
 
@@ -111,8 +114,20 @@ class TriggerService{
 			if( contacts.length === 0 ) return { message:"it looks like you do not have an emergency  ",status: "not_sent" };
 
 
+			const contactList = contacts[0].contacts;
+			if( contactList.length === 0 ) return { message:"There is no emergency contact to send it to", status: "not_sent", noContact:true  };
+
+
+
 			const {  fname,lname,phone  } = user[0];
 			const frsp_name = contacts[0].contacts[0].name;
+		
+
+
+
+
+
+
 			let frsp_phone = contacts[0].contacts[0].phoneNumbers[0].number;
 			frsp_phone = frsp_phone.replace(/\s/g, '');
 

@@ -11,6 +11,10 @@ router.post("/get_rec_phone", userController.getUserwithPhone);
 router.put("/update_profile/:userId", userController.updateProfile);
 router.get("/dependents/:phoneNumber",userController.getDependents);
 router.delete("/delete_dependent/:phoneNumber/:dependentPhone", userController.deleteDependent);
+router.post("/add_contacts",userController.addEmergencyContact);
+router.get("/get_contacts/:email",userController.getEmergencyContact);
+
+
 
 
 module.exports = router;
