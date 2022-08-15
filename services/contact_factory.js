@@ -119,8 +119,68 @@ class ContactFactory{
 			return { message:e.message, contacts:[] };
 		}
 	}
-	static async deleteEmergencyContact(){
-		
+	static async deleteEmergencyContact(contactParams){
+
+
+
+		try{
+
+			const { requestParams,requestBody,models,dependencies } = contactParams;
+			const [ Contact ] = models;
+			const [ Dao ] = dependencies
+
+
+			const { email } = requestParams;
+			const { lookupKey } = requestBody;
+
+
+
+			const payload = { email:email };
+			const contact_doc = await Dao.get( Contact, payload );
+
+
+
+			if( contact_doc.length === 0  ) return { message:`this user doesn't have any contact`, deleted:false  };
+
+
+			const {contacts} = contact_doc[0]; // contacts is an array so we would loop through the array;
+			let spliced = false;
+
+
+			for( const [index,contact] of contacts.entries() ){
+
+
+
+
+				if( contact.lookupKey.trim() !== lookupKey.trim() ) continue;
+
+				spliced = true;
+				contacts.splice(index,1);
+				break;
+				
+
+			}
+
+
+			if( spliced === false ) return { message: `this contact does not exist to be deleted. `, deleted:false };
+
+
+			const updateCondition = { email:email  }
+			const updateBody = { contacts:contacts }
+			const updateContact = await Dao.updateOne( Contact,updateCondition,updateBody );
+
+
+			if( updateContact ) return { message:`deleted contact successfully`, deleted:true };
+
+
+			return { message:`error in deleting contact. `, deleted:false };
+
+
+		}
+		catch(e){
+			return { message:e.message, deleted:false };
+		}
+
 	}
 
 }

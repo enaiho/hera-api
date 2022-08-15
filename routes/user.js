@@ -13,6 +13,7 @@ router.get("/dependents/:phoneNumber",userController.getDependents);
 router.delete("/delete_dependent/:phoneNumber/:dependentPhone", userController.deleteDependent);
 router.post("/add_contacts",userController.addEmergencyContact);
 router.get("/get_contacts/:email",userController.getEmergencyContact);
+router.patch("/delete_contact/:email", userController.deleteEmergencyContact);
 
 
 

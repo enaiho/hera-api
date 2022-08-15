@@ -5,10 +5,10 @@ class Dao{
 
 	static async save( model,payload ){
 
-
 		const daoObject = new model(payload);
 		const saved = await daoObject.save();
 		return saved;
+
 	}
 	static async get( model,payload ){
 
@@ -23,6 +23,10 @@ class Dao{
 	static async updateOne(model,updateCondition,updateBody){
 
 		const update = await model.updateOne( updateCondition,updateBody );
+		return update;
+	}
+	static async findOneAndUpdate(model,updateCondition,updateBody){
+		const update = await model.findOneAndUpdate( updateCondition,updateBody );
 		return update;
 	}
 

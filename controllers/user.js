@@ -371,6 +371,31 @@ exports.getEmergencyContact = async(req,res) => {
 	catch(e){
 		return res.status(500).json({message:e.message});
 	}
+}
+exports.deleteEmergencyContact = async(req,res) => {
+
+	try{
+
+		const contactParams = {
+			"requestParams":req.params,
+			"requestBody":req.body,
+			"models":[Contact],
+			"dependencies":[Dao]
+		}
+
+
+	
+		const { deleted,message  } = await ContactFactory.deleteEmergencyContact(contactParams);
+		// console.log( message );
+			
+		return res.status(200).json( { message: message, status:deleted } );
+
+	
+
+	}
+	catch(e){
+		return res.status(500).json({message:e.message,status:false});
+	}
 
 }
 
