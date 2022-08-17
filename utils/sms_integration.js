@@ -28,7 +28,7 @@ class SmsIntegration{
 			const response = await useHttpPost( postParams );
 
 
-			console.log( response.data );
+			// console.log( response.data );
 
 
 			const { code,message_id  } = response.data;

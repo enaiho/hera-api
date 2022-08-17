@@ -16,19 +16,13 @@ class Notification{
 
 		try{
 
-
-
 			// const response = { message_id:"test_id",sent:true };
 
 
-			const response = smsIntegration.send( data); // uncomment this line when you want sms or messages to be sent
-
-
+			const response = await smsIntegration.send( data); // uncomment this line when you want sms or messages to be sent
 			const { message_id,sent  } = response;
 
-
-			console.log( response );
-
+			// console.log( response );
 
 			const message_info = { message:message,message_id:message_id,sent:sent };
 			const payload = {phone:phone,message_info:message_info,message_count:message.length,type:"sms",event:event};
@@ -46,12 +40,9 @@ class Notification{
 		catch(e){ 
 			return { message: e.message, status: false   };
 		}
-
-
 	}
 
 	sendEmail(data){
-
 	}
 
 	sendPushNotification(data){

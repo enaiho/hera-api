@@ -180,7 +180,44 @@ class ContactFactory{
 		catch(e){
 			return { message:e.message, deleted:false };
 		}
+	}
+	static async isHaveEmergencyContact(phone,ContactModel,UserModel,Dao){
 
+
+		try{
+
+			let payload = { phone:phone };
+			const user = await Dao.get( UserModel,payload );
+
+			console.log( "user exist" );
+			console.log( user.length );
+
+
+			if( user.length === 0 ) return false;
+
+			const { email } = user[0];
+
+			console.log( "user exist" );
+
+			payload = { email:email  };
+			const contact = await Dao.get( ContactModel, payload );
+
+			if( contact.length === 0 ) return false;
+
+			const {contacts} = contact[0];
+
+			if( contacts.length === 0 ) return false;
+
+			return true;
+
+
+		}
+
+		catch( e ){
+
+			console.log( e.message );
+			return false;
+		}
 	}
 
 }

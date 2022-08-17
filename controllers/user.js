@@ -115,9 +115,11 @@ exports.getUserwithPhone = async(req,res) => {
 	const user  = await Dao.get(User,payload);
 
 
-	if( user.length === 0 ) return res.json( {message: "phone number is incorrect. ", authenticated: false} );
+	if( user.length === 0 ) return res.json( {message: "phone number is incorrect. ", authenticated: false, contact_status:false} );
 	
-	return res.json( { message:"record retrieved successfully. ",authenticated:true, user:user[0]  });	
+	const contact_status = await ContactFactory.isHaveEmergencyContact( phone,Contact,User,Dao );
+
+	return res.json( { message:"record retrieved successfully. ",authenticated:true, user:user[0],contact_status:contact_status  });	
 }
 exports.updateProfile = async(req,res) => {
 
@@ -387,7 +389,7 @@ exports.deleteEmergencyContact = async(req,res) => {
 	
 		const { deleted,message  } = await ContactFactory.deleteEmergencyContact(contactParams);
 		// console.log( message );
-			
+
 		return res.status(200).json( { message: message, status:deleted } );
 
 	
