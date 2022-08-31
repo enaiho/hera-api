@@ -12,7 +12,6 @@ class ActivityMessage {
   /**
    * @returns {string} -- Returns the description of the activity message for adding emergency contact
    * @param {string} name -- Represents the name of the user
-@function
    */
   static addContactMessageFactory(name) {
     return `${name}  added you to his emergency contact(s) .`;
@@ -21,7 +20,6 @@ class ActivityMessage {
   /**
    * @returns {string} -- Returns the description of the activity message for deleting emergency contact
    * @param {string} name -- Represents the name of the user
-  @function
    */
   static deleteContactMessageFactory(name) {
     return `${name} is no longer your dependent. `;
