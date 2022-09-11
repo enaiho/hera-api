@@ -258,8 +258,8 @@ exports.addEmergencyContact = async (req, res) => {
   try {
     const factoryParams = {
       'requestBody': req.body,
-      'models': [Contact, User],
-      'dependencies': [Dao, Notification, cleanPhoneNumber, Activity, SolacePNService],
+      'models': {Contact, User},
+      'dependencies': {Dao, Notification, cleanPhoneNumber, Activity, SolacePNService},
     };
 
     const {created, message} = await ContactFactory.createEmergencyContact(factoryParams);
