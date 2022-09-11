@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const circleSchema = new Schema({
 
-    name:String,
-    user_id:String,
-    status:Number
+  name: String,
+  userId: String,
+  status: Number,
 
-},{ timestamps:true });
+}, {timestamps: true});
 
-module.exports = mongoose.model("Circle",circleSchema);
+module.exports = mongoose.model('Circle', circleSchema);
