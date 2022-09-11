@@ -2,6 +2,7 @@
 
 const SOLACE_CONFIG = require('../utils/solace_config');
 const Transaction = require('mongoose-transactions');
+const { cleanPhoneNumber } = require('../utils/helper');
 const transaction = new Transaction();
 
 /**
@@ -108,7 +109,10 @@ class TriggerService {
       let frspPhone = contacts[0].contacts[0].phoneNumbers[0].number;
       frspPhone = frspPhone.replace(/\s/g, '');
 
-      if ( frspPhone.indexOf('+') > -1 ) frspPhone = frspPhone.slice(1, frspPhone.length);
+      
+      frspPhone = cleanPhoneNumber(frspPhone);
+
+      // if ( frspPhone.indexOf('+') > -1 ) frspPhone = frspPhone.slice(1, frspPhone.length);
 
 
       const outBoundMessage = `[Solace] Hi ${frspName}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.:  ${SOLACE_CONFIG.SOLACE_DOMAIN}/emergency/${triggerId} `;
