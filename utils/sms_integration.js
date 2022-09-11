@@ -14,8 +14,8 @@ class SmsIntegration {
    * @class
    */
   constructor( args ) {
-    const {api_key} = args;
-    this.api_key = api_key;
+    const {apiKey} = args;
+    this.apiKey = apiKey;
   }
   /**
    *
@@ -24,7 +24,7 @@ class SmsIntegration {
    */
   async send( params ) {
     const {message, phone} = params;
-    const data = {'to': phone, 'from': 'N-Alert', 'sms': message, 'type': 'plain', 'api_key': `${this.api_key}`, 'channel': 'dnd'};
+    const data = {'to': phone, 'from': 'N-Alert', 'sms': message, 'type': 'plain', 'api_key': `${this.apiKey}`, 'channel': 'dnd'};
     const headers = {'headers': {'Content-Type': ['application/json', 'application/json']}};
 
 

@@ -42,18 +42,13 @@ class ContactFactory {
   static async createEmergencyContact(factoryParams) {
     try {
       const {requestBody, models, dependencies} = factoryParams;
-      const [Contact, User] = models;
-      const [Dao, cleanPhoneNumber, Activity] = dependencies;
+      const {Contact, User} = models;
+      const {Dao, cleanPhoneNumber, Activity} = dependencies;
 
 
       const {email, contacts, userId} = requestBody;
       const payload = {email: email.trim()};
       const parsedContacts = JSON.parse(contacts);
-
-
-      // const lookupKeys = parsedContacts.map( (contact) => contact.lookupKey );
-      // const phoneNumbers = [];
-
 
       const contact = new Contact({
         contacts: parsedContacts,
@@ -80,6 +75,9 @@ class ContactFactory {
       }
 
 
+
+
+
       // ContactFactory.notify(contacts,cleanPhoneNumber);
       // loop through the parsed_contacts to see if the number is a solace user
 
@@ -87,6 +85,7 @@ class ContactFactory {
       for ( const arrContacts of parsedContacts ) {
         const arrPhoneNumbers = arrContacts.phoneNumbers;
         for ( const recPhone of arrPhoneNumbers ) {
+
           const sanitizedPhone = cleanPhoneNumber(recPhone.number);
           const user = await Dao.get( User, {phone: sanitizedPhone});
 
@@ -97,7 +96,7 @@ class ContactFactory {
           break;
         }
       }
-
+      
       return {message: `contact created successfully. `, created: true};
     } catch (e) {
       console.log( e.message );

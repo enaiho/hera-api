@@ -18,11 +18,12 @@ class TriggerService {
    */
   static async #createPanicAlertFactory(triggerResourceParams) {
     const {requestBody, models, dependencies} = triggerResourceParams;
-    const [Trigger] = models;
-    const [Geolocation, Dao] = dependencies;
+    const {Trigger} = models;
+    const {Geolocation, Dao} = dependencies;
     let {email, location, batteryDetails, triggerId} = requestBody;
 
     const geolocation = new Geolocation();
+
 
 
     try {
@@ -50,7 +51,7 @@ class TriggerService {
 
 
       const resolveStatus = await geolocation.resolveGeoLocation(location);
-      if ( resolveStatus === false ) return {message: 'There was an error in resolving the geo location data. ', status: ''};
+      if ( resolveStatus === false ) return {message: 'There was an error in resolving the geo location data. ', status: false};
 
 
       const updateData = {reverse_geodata: resolveStatus};
@@ -58,17 +59,18 @@ class TriggerService {
 
 
       const final = await transaction.run();
+      transaction.clean(); // clean the transactionn after every run. 
 
 
-      if ( final ) return {message: 'message sent successfully ', triggerId: triggerId.toString(), status: 'sent'};
+      if ( final ) return {message: 'message sent successfully ', triggerId: triggerId.toString(), status: true};
     } catch (error) {
       console.error(error);
       await transaction.rollback().catch(console.error);
       transaction.clean();
-      return {message: error.message, status: 'not sent'};
+      return {message: error.message, status: false};
     }
 
-    return {message: 'error in sending trigger ', status: 'not sent'};
+    return {message: 'error in sending trigger ', status: false};
   }
   /**
    *
@@ -81,8 +83,8 @@ class TriggerService {
     if ( status === false) return {message: message, status: status};
 
     const {requestBody, models, dependencies} = triggerResourceParams;
-    const [User, Contact, IncidentOptions] = models;
-    const [Dao, Notification] = dependencies;
+    const {User, Contact, IncidentOptions} = models;
+    const {Dao, Notification} = dependencies;
     const {email} = requestBody;
 
 
@@ -94,7 +96,6 @@ class TriggerService {
 
       if ( user.length === 0 ) return {message: 'user does not exist ', status: 'not_sent'};
       if ( contacts.length === 0 ) return {message: 'it looks like you do not have an emergency  ', status: 'not_sent'};
-
 
       const contactList = contacts[0].contacts;
       if ( contactList.length === 0 ) return {message: 'There is no emergency contact to send it to', status: 'not_sent', noContact: true};
@@ -110,9 +111,6 @@ class TriggerService {
       if ( frspPhone.indexOf('+') > -1 ) frspPhone = frspPhone.slice(1, frspPhone.length);
 
 
-      // console.log(frspPhone);
-
-
       const outBoundMessage = `[Solace] Hi ${frspName}, Your friend ${fname} seems to be unsafe. Click the link below to see their location.:  ${SOLACE_CONFIG.SOLACE_DOMAIN}/emergency/${triggerId} `;
       const sendTriggerMessage = await new Notification().sendOTPCode( {message: outBoundMessage, phone: frspPhone, event: 'trigger'} );
 
@@ -125,7 +123,6 @@ class TriggerService {
       return {message: e.message, status: 'not sent'};
     }
 
-    return {message: 'error occurred in triggering panic alert. ', status: 'not sent'};
   }
   /**
    *

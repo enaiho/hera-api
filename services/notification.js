@@ -22,9 +22,11 @@ class Notification {
     try {
       // const response = {messageId: 'test_id', sent: true};
 
-      const smsIntegration = new SmsIntegration({api_key: SOLACE_CONFIG.SMS_API_KEY});
+      const smsIntegration = new SmsIntegration({apiKey: SOLACE_CONFIG.SMS_API_KEY});
       const response = await smsIntegration.send( data); // uncomment this line when you want sms or messages to be sent
       const {messageId, sent} = response;
+
+      console.log(message);
 
       const messageInfo = {message: message, messageId: messageId, sent: sent};
       const payload = {phone: phone, messageInfo: messageInfo, message_count: message.length, type: 'sms', event: event};

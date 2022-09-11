@@ -17,7 +17,9 @@ const DB_URI = SOLACE_CONFIG.DB_URI;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cors());
+app.use("/uploads",express.static('uploads'));
 app.options('*', cors());
+
 
 app.use('/', indexRoutes);
 app.use('/user', userRoutes);

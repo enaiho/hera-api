@@ -68,9 +68,10 @@ exports.registerUser = async (req, res)=>{
     const contactRequestBody = {email: email, phone: phone, contacts: contacts};
     const factoryParams = {
       'requestBody': contactRequestBody,
-      'models': [Contact],
-      'dependencies': [Dao, Notification, cleanPhoneNumber],
+      'models': {Contact,User},
+      'dependencies': {Dao, Notification, cleanPhoneNumber,Activity}, 
     };
+
 
     const {created, message} = await ContactFactory.createEmergencyContact(factoryParams);
     if ( !created ) return res.status(200).json( {message: message, status: created} );
@@ -102,6 +103,27 @@ exports.updateProfile = async (req, res) => {
     }
 
     return res.json( {message: 'Error occured in updating profile. ', status: false} );
+  } catch (e) {
+    return res.json( {message: e.message, status: false} );
+  }
+};
+exports.updateProfilePicture = async (req, res) => {
+  try {
+
+    const requestBody =  JSON.parse(JSON.stringify(req.body)); 
+    const { filename,size } = req.file;
+    const {userId} = requestBody;
+    const updateBody = {
+      image:filename,
+      size:size
+    }
+    const update = await User.updateOne( {_id:userId},updateBody  );
+    if( update ) {
+      const user  = await Dao.get(User,{_id:userId});
+      return res.json( {message: 'Profile picture has been updated successfully.', status:true, user: user[0]}  );
+    }
+    return res.json( {message: 'Error occured in updating profile picture. ', status: false} );
+
   } catch (e) {
     return res.json( {message: e.message, status: false} );
   }

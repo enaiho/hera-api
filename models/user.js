@@ -16,6 +16,8 @@ const userSchema = new Schema({
   otp: String,
   otp_verified: Number,
   active: Number,
+  image: String,
+  size: Number
 
 
 }, {timestamps: true});

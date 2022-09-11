@@ -42,8 +42,6 @@ exports.getEmergencyDetails = async (req, res) => {
     const {fname, lname, phone} = userRec[0];
 
 
-    // console.log( triggers );
-
     const userData = {
 
 
@@ -105,32 +103,36 @@ administrative_area_level_1
   }
 };
 exports.verifyPhoneNumber = async (req, res) => {
-  const {phone} = req.body;
-  const otpCode = generateCode();
-  let otpSent = false;
+  try {
+    const {phone} = req.body;
+    const otpCode = generateCode();
+    let otpSent = false;
 
 
-  const otpData = {
+    const otpData = {
 
-    message: `Hello, your Solace confirmation code is ${otpCode}.`,
-    phone: `${phone}`,
-    event: `otp`,
-  };
-
-
-  const notification = new Notification();
-  const otpResponse = await notification.sendOTPCode( otpData );
-
-  const {message, status} = otpResponse;
+      message: `Hello, your Solace confirmation code is ${otpCode}.`,
+      phone: `${phone}`,
+      event: `otp`,
+    };
 
 
-  if ( status===false ) return res.status(500).json({message: message, exist: status, otpSent: otpSent, otpCode: otpCode});
+    const notification = new Notification();
+    const otpResponse = await notification.sendOTPCode( otpData );
 
-  otpSent = true;
+    const {message, status} = otpResponse;
 
-  const payload = {phone: phone};
-  const user = Dao.get(User, payload);
-  if ( user.length === 0 || user === undefined ) return res.json({message: 'Number does not exist', exist: false, otpSent: otpSent, otpCode: otpCode});
-  return res.json({message: 'Number founded', exist: true, otpSent: otpSent, otpCode: otpCode});
+
+    if ( status===false ) return res.status(500).json({message: message, exist: status, otpSent: otpSent, otpCode: otpCode});
+
+    otpSent = true;
+
+    const payload = {phone: phone};
+    const user = await Dao.get(User, payload);
+    if ( user.length === 0 || user === undefined ) return res.json({message: 'Number does not exist', exist: false, otpSent: otpSent, otpCode: otpCode});
+    return res.json({message: 'Number found', exist: true, otpSent: otpSent, otpCode: otpCode});
+  } catch (e) {
+    return res.status(500).json({message: e.message, exist: false});
+  }
 };
 

@@ -32,8 +32,8 @@ exports.triggerPanicAlert = async (req, res)=>{
     const triggerResourceParams = {
 
       'requestBody': req.body,
-      'models': [Trigger, Instance, Battery, Location, User, Contact, IncidentOptions],
-      'dependencies': [Geolocation, Dao, Notification],
+      'models': {Trigger, Instance, Battery, Location, User, Contact, IncidentOptions},
+      'dependencies': {Geolocation, Dao, Notification},
     };
 
     const createTriggerPanic = await TriggerService.createPanicAlertResource(triggerResourceParams);
